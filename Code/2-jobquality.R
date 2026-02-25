@@ -22,7 +22,7 @@
     summarise(mean(physical),mean(stress),mean(poverty),mean(anybad))
   
   # Get data right for regression, only recent waves
-  regdat <- hrs |> filter(wave%in%9:15 & 
+  regdat <- hrs |> filter(wave%in%9:16 & 
                             race!="Other" &
                             stateboth %in% c("working/healthy","working/unhealthy"))
   

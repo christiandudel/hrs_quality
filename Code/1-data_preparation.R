@@ -12,7 +12,7 @@
   if(!file.exists(rdafile)) { 
 
     # Data; can be obtained from https://hrs.isr.umich.edu
-    dtafile <- "Data/randhrs1992_2020v2.dta"
+    dtafile <- "Data/randhrs1992_2022v1.dta"
     
     # Load
     hrs <- read.dta13(file=dtafile,
@@ -68,7 +68,7 @@
            race=ifelse(raracem%in%3 & is.na(rahispan),"Other",race))
   
   
-  # Drop if education is missing (22 individuals, negligible)
+  # Drop if education/race is missing (573 individuals, negligible)
   dim(hrs)
   hrs |> filter(is.na(education) | is.na(race)) |> count()
   hrs <- hrs |> filter(!is.na(education) & !is.na(race))
@@ -77,13 +77,13 @@
 ### Rename vars for easier reshaping below #####################################
 
   # Wave status
-  hrs <- hrs |> rename_with(~paste0("r",1:15,"inw"),starts_with("inw"))
+  hrs <- hrs |> rename_with(~paste0("r",1:16,"inw"),starts_with("inw"))
   
   # Age
-  hrs <- hrs |> rename_with(~paste0("r",1:15,"age"),ends_with("agey_e"))
+  hrs <- hrs |> rename_with(~paste0("r",1:16,"age"),ends_with("agey_e"))
   
   # Poverty
-  hrs <- hrs |> rename_with(~paste0("r",1:15,"inpov"),ends_with("inpov"))
+  hrs <- hrs |> rename_with(~paste0("r",1:16,"inpov"),ends_with("inpov"))
 
   # Empty vars for reshaping later (required by reshape function)
   hrs$r1mobila <- NA
@@ -104,7 +104,7 @@
   repvars <- grepl("_",names(hrs))   
   repvars <- names(hrs)[repvars]
   repvars <- unique(unlist(lapply(strsplit(repvars,split="_"),function(x)x[1])))
-  repvars <- paste(rep(repvars, each = length(1:15)), 1:15, sep = "_")
+  repvars <- paste(rep(repvars, each = length(1:16)), 1:16, sep = "_")
   
   # Reshape (pivot_longer is just not intuitive to me, sorry)
   hrs <- reshape(data=as.data.frame(hrs),
@@ -146,6 +146,7 @@
                          toedit==1 & wave==13~2015,
                          toedit==1 & wave==14~2017,
                          toedit==1 & wave==15~2019,
+                         toedit==1 & wave==16~2021,
                          .default=radyear
                        ),
                        age=ifelse(iwstat==5&is.na(age),radyear-rabyear,age))
