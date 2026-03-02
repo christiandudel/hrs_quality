@@ -13,11 +13,11 @@
 ### Analysis of phyiscal, stress, poverty ######################################
 
   # Descriptive 
-  quality_wu <- hrs |> filter(stateboth=="working/unhealthy" & wave%in%9:15) |> 
+  quality_wu <- hrs |> filter(stateboth=="working/unhealthy" & wave%in%9:16) |> 
     group_by(gender,race,education) |> 
     summarise(mean(physical),mean(stress),mean(poverty),mean(anybad))
   
-  quality_wh <- hrs |> filter(stateboth=="working/healthy" & wave%in%9:15) |> 
+  quality_wh <- hrs |> filter(stateboth=="working/healthy" & wave%in%9:16) |> 
     group_by(gender,race,education) |> 
     summarise(mean(physical),mean(stress),mean(poverty),mean(anybad))
   
