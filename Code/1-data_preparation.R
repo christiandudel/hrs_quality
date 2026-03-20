@@ -233,13 +233,18 @@
   hrs <- hrs |> mutate(anybad=NA,
                        anybad=ifelse(physical%in%1 | stress%in%1 | poverty%in%1,1,anybad),
                        anybad=ifelse(physical%in%0 & stress%in%0 & poverty%in%0,0,anybad))
-
+  
+  # All
+  hrs <- hrs |> mutate(allbad=NA,
+                       allbad=ifelse(physical%in%1 & stress%in%1 & poverty%in%1,1,allbad),
+                       allbad=ifelse(physical%in%0 | stress%in%0 | poverty%in%0,0,anybad))
+  
   
 ### Limit data #################################################################
 
   # Limit variables
   hrs <- hrs |> select(hhidpn,ragender,race,education,wave,age,stateboth,
-                       stress,physical,poverty,anybad,wtresp)
+                       stress,physical,poverty,anybad,allbad,wtresp)
 
   # Rename
   hrs <- hrs |> rename('gender'='ragender',

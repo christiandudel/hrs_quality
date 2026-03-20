@@ -15,11 +15,11 @@
   # Descriptive 
   quality_wu <- hrs |> filter(stateboth=="working/unhealthy" & wave%in%9:16) |> 
     group_by(gender,race,education) |> 
-    summarise(mean(physical),mean(stress),mean(poverty),mean(anybad))
+    summarise(mean(physical),mean(stress),mean(poverty),mean(anybad),mean(allbad))
   
   quality_wh <- hrs |> filter(stateboth=="working/healthy" & wave%in%9:16) |> 
     group_by(gender,race,education) |> 
-    summarise(mean(physical),mean(stress),mean(poverty),mean(anybad))
+    summarise(mean(physical),mean(stress),mean(poverty),mean(anybad),mean(allbad))
   
   # Get data right for regression, only recent waves
   regdat <- hrs |> filter(wave%in%9:16 & 
