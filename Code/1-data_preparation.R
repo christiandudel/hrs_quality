@@ -38,6 +38,10 @@
                        starts_with("r")&ends_with("mobila"),
                        # Sum of large muscle difficulties
                        starts_with("r")&ends_with("lgmusa"),
+                       # Self reported health (1 = excellent, 5=very bad)
+                       starts_with("r")&ends_with("shlt"),
+                       # Depression symptoms (0=no, 1=yes)
+                       starts_with("r")&ends_with("depyr"),
                        # Labor force status
                        starts_with("r")&ends_with("lbrf")&!contains("inlbrf"),
                        # Current job requires physical effort
@@ -88,6 +92,8 @@
   # Empty vars for reshaping later (required by reshape function)
   hrs$r1mobila <- NA
   hrs$r1lgmusa <- NA
+  hrs$r1depyr <- NA
+  hrs$r2depyr <- NA
 
   # Change format of time varying variables (not a great solution, but works)
   hrsnames <- str_split_fixed(names(hrs),"r[[:digit:]]{1,2}",2)
@@ -198,10 +204,7 @@
                        workboth=ifelse(worksimple%in%"retired" & both%in%0,"retired/healthy",workboth),
                        workboth=ifelse(worksimple%in%"retired" & both%in%1,"retired/unhealthy",workboth),
                        workboth=ifelse(worksimple%in%"not working" & !is.na(both) ,"not working",workboth))
-  
-  # Missing person-years
-  table(hrs$stateboth,useNA="always") |> prop.table()
-  
+
 
 ### State variables (including death) ##########################################
   
@@ -210,6 +213,29 @@
                        stateboth=ifelse(iwstat==1,workboth,stateboth),
                        stateboth=ifelse(iwstat==5,"dead",stateboth))
   
+  # Missing person-years
+  table(hrs$stateboth,useNA="always") |> prop.table()
+  
+  
+### Self-rated health & depression #############################################
+  
+  # Self-rated health
+  hrs <- hrs |> mutate(workshlt=NA,
+                       workshlt=ifelse(worksimple%in%"working" & shlt%in%3:5,"working/healthy",workshlt),
+                       workshlt=ifelse(worksimple%in%"working" & shlt%in%1:2,"working/unhealthy",workshlt),
+                       workshlt=ifelse(worksimple%in%"retired" & shlt%in%3:5,"retired/healthy",workshlt),
+                       workshlt=ifelse(worksimple%in%"retired" & shlt%in%1:2,"retired/unhealthy",workshlt),
+                       workshlt=ifelse(worksimple%in%"not working" & !is.na(shlt) ,"not working",workshlt),
+                       workshlt=ifelse(iwstat==5,"dead",workshlt))
+  
+  # Depression
+  hrs <- hrs |> mutate(workdepyr=NA,
+                       workdepyr=ifelse(worksimple%in%"working" & depyr%in%0,"working/healthy",workdepyr),
+                       workdepyr=ifelse(worksimple%in%"working" & depyr==1,"working/unhealthy",workdepyr),
+                       workdepyr=ifelse(worksimple%in%"retired" & depyr==0,"retired/healthy",workdepyr),
+                       workdepyr=ifelse(worksimple%in%"retired" & depyr==1,"retired/unhealthy",workdepyr),
+                       workdepyr=ifelse(worksimple%in%"not working" & !is.na(depyr) ,"not working",workdepyr),
+                       workdepyr=ifelse(iwstat==5,"dead",workdepyr))
   
 
 ### Recode physical, stress, poverty ###########################################
@@ -232,19 +258,41 @@
   # Any (1=yes, 0=no)
   hrs <- hrs |> mutate(anybad=NA,
                        anybad=ifelse(physical%in%1 | stress%in%1 | poverty%in%1,1,anybad),
-                       anybad=ifelse(physical%in%0 & stress%in%0 & poverty%in%0,0,anybad))
+                       anybad=ifelse(physical%in%0 & stress%in%0 & poverty%in%0,0,anybad),
+                       anybad=ifelse(is.na(physical)|is.na(stress)|is.na(poverty),NA,anybad))
   
   # All
   hrs <- hrs |> mutate(allbad=NA,
                        allbad=ifelse(physical%in%1 & stress%in%1 & poverty%in%1,1,allbad),
-                       allbad=ifelse(physical%in%0 | stress%in%0 | poverty%in%0,0,anybad))
+                       allbad=ifelse(physical%in%0 | stress%in%0 | poverty%in%0,0,allbad),
+                       allbad=ifelse(is.na(physical)|is.na(stress)|is.na(poverty),NA,allbad))
+  
+  # Pairwise combinations: phyiscal & stress (poverty could be true or false or missing)
+  hrs <- hrs |> mutate(pair1=NA,
+                       pair1=ifelse(physical%in%1 & stress%in%1,1,anybad),
+                       pair1=ifelse(physical%in%0 & stress%in%0,0,anybad),
+                       pair1=ifelse(is.na(physical)|is.na(stress),NA,pair1))
+  
+  # Pairwise combinations: phyiscal & poverty (stress could be true or false or missing)
+  hrs <- hrs |> mutate(pair2=NA,
+                       pair2=ifelse(physical%in%1 & poverty%in%1,1,anybad),
+                       pair2=ifelse(physical%in%0 & poverty%in%0,0,anybad),
+                       pair2=ifelse(is.na(physical)|is.na(poverty),NA,pair2))
+  
+  # Pairwise combinations: stress & poverty (physical could be true or false or missing)
+  hrs <- hrs |> mutate(pair3=NA,
+                       pair3=ifelse(stress%in%1 & poverty%in%1,1,anybad),
+                       pair3=ifelse(stress%in%0 & poverty%in%0,0,anybad),
+                       pair3=ifelse(is.na(stress)|is.na(poverty),NA,pair3))
   
   
 ### Limit data #################################################################
 
   # Limit variables
-  hrs <- hrs |> select(hhidpn,ragender,race,education,wave,age,stateboth,
-                       stress,physical,poverty,anybad,allbad,wtresp)
+  hrs <- hrs |> select(hhidpn,ragender,race,education,wave,age,
+                       stateboth,workshlt,workdepyr,shlt,depyr,
+                       stress,physical,poverty,anybad,allbad,pair1,pair2,pair3,
+                       wtresp)
 
   # Rename
   hrs <- hrs |> rename('gender'='ragender',
