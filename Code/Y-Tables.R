@@ -7,7 +7,8 @@
 ### Descriptive ################################################################
 
   load(file="Results/descriptive_big.rda")
-  write_xlsx(quality,path="Results/descriptive.xlsx")
+  
+  write_xlsx(descriptive,path="Results/descriptive.xlsx")
   
   
 ### Main regression results ####################################################  

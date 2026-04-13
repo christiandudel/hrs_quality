@@ -298,6 +298,9 @@
   hrs <- hrs |> rename('gender'='ragender',
                        'id'='hhidpn',
                        'weight'='wtresp')
+  
+  # Drop observations below age 50 (partners)
+  hrs <- hrs |> filter(age>=50)
 
 
 ### Saving #####################################################################
