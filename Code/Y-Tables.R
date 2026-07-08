@@ -8,7 +8,7 @@
 
   load(file="Results/descriptive_big.rda")
   
-  write_xlsx(descriptive,path="Results/descriptive.xlsx")
+  write_xlsx(descriptive,path="Output/descriptive.xlsx")
   
   
 ### Main regression results ####################################################  
