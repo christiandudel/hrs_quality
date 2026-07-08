@@ -129,6 +129,7 @@
                     ame_stress_f_h[ame_stress_f_h$factor=="statebothworking/unhealthy","upper"],
                     ame_poverty_f_h[ame_poverty_f_h$factor=="statebothworking/unhealthy","upper"])
   
+  pdf(file="Output/mainresults_white.pdf",width=7,height=7)
   labels <- c("Physical","Stress","Poverty")
   fake <- rep(100,3)
   names(fake) <- labels
@@ -141,7 +142,9 @@
   points(y=(1:3)-0.2,x=rev(AMEmen_w),pch=15,col="#1b9e77",cex=1.25)
   points(y=(1:3)+0.2,x=rev(AMEwomen_w),pch=17,col="#d95f02",cex=1.25)
   legend(x=0.1,y=2,pch=c(17,15),legend=c("Women","Men"),col=c("#d95f02","#1b9e77"),cex=1.25)
+  dev.off()
   
+  pdf(file="Output/mainresults_black.pdf",width=7,height=7)
   dotchart(x=rev(fake),xlab="Average marginal effect of unhealthy work",xlim=c(-0.075,0.15),pch=15,ylim=c(0.5,3.5),main="Black")
   abline(v=0,col="grey70")
   abline(h=1.5)
@@ -151,7 +154,9 @@
   points(y=(1:3)-0.2,x=rev(AMEmen_b),pch=15,col="#1b9e77",cex=1.25)
   points(y=(1:3)+0.2,x=rev(AMEwomen_b),pch=17,col="#d95f02",cex=1.25)
   legend(x=0.1,y=2,pch=c(17,15),legend=c("Women","Men"),col=c("#d95f02","#1b9e77"),cex=1.25)
+  dev.off()
   
+  pdf(file="Output/mainresults_hispanic.pdf",width=7,height=7)
   dotchart(x=rev(fake),xlab="Average marginal effect of unhealthy work",xlim=c(-0.075,0.15),pch=15,ylim=c(0.5,3.5),main="Hispanic")
   abline(v=0,col="grey70")
   abline(h=1.5)
@@ -161,6 +166,7 @@
   points(y=(1:3)-0.2,x=rev(AMEmen_h),pch=15,col="#1b9e77",cex=1.25)
   points(y=(1:3)+0.2,x=rev(AMEwomen_h),pch=17,col="#d95f02",cex=1.25)
   legend(x=0.1,y=2,pch=c(17,15),legend=c("Women","Men"),col=c("#d95f02","#1b9e77"),cex=1.25)
+  dev.off()
 
   
 ### Robustness checks ##########################################################
