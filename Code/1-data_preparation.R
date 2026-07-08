@@ -42,14 +42,20 @@
                        starts_with("r")&ends_with("shlt"),
                        # Depression symptoms (0=no, 1=yes)
                        starts_with("r")&ends_with("depyr"),
+                       # Cognition 27
+                       starts_with("r")&ends_with("cog27"),
                        # Labor force status
                        starts_with("r")&ends_with("lbrf")&!contains("inlbrf"),
                        # Current job requires physical effort
                        starts_with("r")&ends_with("jphys"),
                        # Current job involves lots of stress
                        starts_with("r")&ends_with("jstres"),
-                       # Poverty
+                       # Poverty (dummy)
                        starts_with("h")&ends_with("inpov"),
+                       # Poverty threshold
+                       starts_with("h")&ends_with("povthr"),
+                       # Household income compared to poverty threshold
+                       starts_with("h")&ends_with("povhhi"),
                        # Weights
                        starts_with("r")&ends_with("wtresp")
                        )
@@ -58,10 +64,10 @@
 ### Education/race #############################################################
 
   # Education, 3 levels, 0=low, 1=medium, 2=high
-  hrs <- hrs |> mutate(education=case_match(raeduc,
-                                            c(1,2)~0,
-                                            c(3,4)~1,
-                                            5~2))
+  hrs <- hrs |> mutate(education=recode_values(raeduc,
+                                               c(1,2)~0,
+                                               c(3,4)~1,
+                                               5~2))
   
   # Race recode
   hrs <- hrs |> mutate(race=NA) |> 
@@ -86,19 +92,28 @@
   # Age
   hrs <- hrs |> rename_with(~paste0("r",1:16,"age"),ends_with("agey_e"))
   
-  # Poverty
+  # Poverty variables
   hrs <- hrs |> rename_with(~paste0("r",1:16,"inpov"),ends_with("inpov"))
+  hrs <- hrs |> rename_with(~paste0("r",1:16,"povthr"),ends_with("povthr"))
+  hrs <- hrs |> rename_with(~paste0("r",1:16,"povhhi"),ends_with("povhhi"))
+  
+  
+  # Cognition
+  hrs <- hrs |> rename_with(~paste0("r",3:15,"cog"),ends_with("cog27"))
 
   # Empty vars for reshaping later (required by reshape function)
   hrs$r1mobila <- NA
   hrs$r1lgmusa <- NA
   hrs$r1depyr <- NA
   hrs$r2depyr <- NA
+  hrs$r1cog <- NA
+  hrs$r2cog <- NA
+  hrs$r16cog <- NA
 
   # Change format of time varying variables (not a great solution, but works)
   hrsnames <- str_split_fixed(names(hrs),"r[[:digit:]]{1,2}",2)
   hrsnames <- apply(hrsnames,1,function(x) {paste0(x,collapse="")})
-  hrsnumbers <- parse_number(names(hrs))
+  hrsnumbers <- parse_number(names(hrs)) # Warning, expected
   hrswhich <- !is.na(hrsnumbers)
   hrsnames[hrswhich] <- paste(hrsnames[hrswhich],hrsnumbers[hrswhich],sep="_")
   names(hrs) <- hrsnames
@@ -170,26 +185,33 @@
   
   
   # Employment (slightly more detailed/simplified)
-  hrs <- hrs |> mutate(workstatus=case_match(
+  hrs <- hrs |> mutate(workstatus=recode_values(
                           lbrf,
                           1:2~"working",
                           3  ~"unemployed",
                           4:5~"retired",
                           6:7~"inactive"),
                         workstatus=ifelse(lbrf%in%6:7&age>=state_pension,"retired",workstatus),
-                        worksimple=case_match(
+                        worksimple=recode_values(
                           workstatus,
                           c("unemployed","inactive")~"not working",
-                          .default=workstatus)) 
+                          default=workstatus)) 
   
   # Mobility, large muscle, both combined
-  hrs <- hrs |> mutate(mobility=case_match(mobila,
+  hrs <- hrs |> mutate(mobility=recode_values(mobila,
                                       0~0,
                                       1:5~1),
-                       muscle=case_match(lgmusa,
+                       muscle=recode_values(lgmusa,
                                        0~0,
                                        1:4~1),
                        both=ifelse(mobility%in%1 | muscle %in%1, 1, 0))
+  
+  # Cognition: dummy
+  threshold <- quantile(hrs$cog,prob=0.25,na.rm=T)
+  hrs <- hrs |> mutate(cogd=recode_values(cog,
+                                          NA~NA,
+                                          0:threshold~1,
+                                          (threshold+1):27~0))
   
   # Get missings right
   hrs <- hrs |> mutate(both=ifelse(is.na(mobility)|is.na(muscle), NA, both))
@@ -231,11 +253,20 @@
   # Depression
   hrs <- hrs |> mutate(workdepyr=NA,
                        workdepyr=ifelse(worksimple%in%"working" & depyr%in%0,"working/healthy",workdepyr),
-                       workdepyr=ifelse(worksimple%in%"working" & depyr==1,"working/unhealthy",workdepyr),
-                       workdepyr=ifelse(worksimple%in%"retired" & depyr==0,"retired/healthy",workdepyr),
-                       workdepyr=ifelse(worksimple%in%"retired" & depyr==1,"retired/unhealthy",workdepyr),
-                       workdepyr=ifelse(worksimple%in%"not working" & !is.na(depyr) ,"not working",workdepyr),
+                       workdepyr=ifelse(worksimple%in%"working" & depyr%in%1,"working/unhealthy",workdepyr),
+                       workdepyr=ifelse(worksimple%in%"retired" & depyr%in%0,"retired/healthy",workdepyr),
+                       workdepyr=ifelse(worksimple%in%"retired" & depyr%in%1,"retired/unhealthy",workdepyr),
+                       workdepyr=ifelse(worksimple%in%"not working" & !is.na(cogd) ,"not working",workdepyr),
                        workdepyr=ifelse(iwstat==5,"dead",workdepyr))
+  
+  # Cognition
+  hrs <- hrs |> mutate(workcogd=NA,
+                       workcogd=ifelse(worksimple%in%"working" & cogd%in%0,"working/healthy",workcogd),
+                       workcogd=ifelse(worksimple%in%"working" & cogd%in%1,"working/unhealthy",workcogd),
+                       workcogd=ifelse(worksimple%in%"retired" & cogd%in%0,"retired/healthy",workcogd),
+                       workcogd=ifelse(worksimple%in%"retired" & cogd%in%1,"retired/unhealthy",workcogd),
+                       workcogd=ifelse(worksimple%in%"not working" & !is.na(cogd) ,"not working",workcogd),
+                       workcogd=ifelse(iwstat==5,"dead",workcogd))
   
 
 ### Recode physical, stress, poverty ###########################################
@@ -255,6 +286,23 @@
                        poverty=ifelse(inpov%in%1,1,poverty),
                        poverty=ifelse(inpov%in%0,0,poverty))
   
+  # Poverty alternatives (75% of threshold, 125%, 150%, 200%)
+  hrs <- hrs |> mutate(poverty75=NA,
+                       poverty75=ifelse(povhhi<povthr*0.75,1,poverty75),
+                       poverty75=ifelse(povhhi>=povthr*0.75,0,poverty75))
+  
+  hrs <- hrs |> mutate(poverty125=NA,
+                       poverty125=ifelse(povhhi<povthr*1.25,1,poverty125),
+                       poverty125=ifelse(povhhi>=povthr*1.25,0,poverty125))
+  
+  hrs <- hrs |> mutate(poverty150=NA,
+                       poverty150=ifelse(povhhi<povthr*1.5,1,poverty150),
+                       poverty150=ifelse(povhhi>=povthr*1.5,0,poverty150))
+  
+  hrs <- hrs |> mutate(poverty200=NA,
+                       poverty200=ifelse(povhhi<povthr*2,1,poverty200),
+                       poverty200=ifelse(povhhi>=povthr*2,0,poverty200))
+
   # Any (1=yes, 0=no)
   hrs <- hrs |> mutate(anybad=NA,
                        anybad=ifelse(physical%in%1 | stress%in%1 | poverty%in%1,1,anybad),
@@ -290,8 +338,9 @@
 
   # Limit variables
   hrs <- hrs |> select(hhidpn,ragender,race,education,wave,age,
-                       stateboth,workshlt,workdepyr,shlt,depyr,
+                       stateboth,workshlt,workdepyr,workcogd,shlt,depyr,cogd,
                        stress,physical,poverty,anybad,allbad,pair1,pair2,pair3,
+                       poverty75,poverty125,poverty150,poverty200,
                        wtresp)
 
   # Rename
