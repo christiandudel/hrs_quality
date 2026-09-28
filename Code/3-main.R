@@ -214,17 +214,26 @@
                             family=binomial(),
                             data=regdatlim_m_w)
   
-  stress_glmer_m_b <- glmer(stress ~  education + age + wave +  stateboth + (1|id),
-                            family=binomial(),
-                            data=regdatlim_m_b)
+  # stress_glmer_m_b <- glmer(stress ~  education + age + wave +  stateboth + (1|id),
+  #                           family=binomial(),
+  #                           data=regdatlim_m_b)
+  
+  stress_glm_m_b <- glm(stress ~  education + age + wave +  stateboth,
+                        family=binomial(),
+                        data=regdatlim_m_b)
+  
   
   stress_glmer_m_h <- glmer(stress ~  education + age + wave +  stateboth + (1|id),
                             family=binomial(),
                             data=regdatlim_m_h)
   
-  poverty_glmer_m_w <- glmer(poverty ~ education + age + wave +  stateboth + (1|id),
-                             family=binomial(),
-                             data=regdatlim_m_w)
+  # poverty_glmer_m_w <- glmer(poverty ~ education + age + wave +  stateboth + (1|id),
+  #                            family=binomial(),
+  #                            data=regdatlim_m_w)
+  poverty_glm_m_w <- glm(poverty ~ education + age + wave +  stateboth,
+                         family=binomial(),
+                         data=regdatlim_m_w)
+  
   
   poverty_glmer_m_b <- glmer(poverty ~ education + age + wave +  stateboth + (1|id),
                              family=binomial(),
@@ -240,10 +249,10 @@
   ame_physical_m_h <- margins(physical_glmer_m_h, type = "response",data=regdatlim_m_h) |> summary() 
   
   ame_stress_m_w <- margins(stress_glmer_m_w, type = "response",data=regdatlim_m_w) |> summary() 
-  ame_stress_m_b <- margins(stress_glmer_m_b, type = "response",data=regdatlim_m_b) |> summary() 
+  ame_stress_m_b <- margins(stress_glm_m_b, type = "response",data=regdatlim_m_b) |> summary() 
   ame_stress_m_h <- margins(stress_glmer_m_h, type = "response",data=regdatlim_m_h) |> summary() 
   
-  ame_poverty_m_w <- margins(poverty_glmer_m_w, type = "response",data=regdatlim_m_w) |> summary() 
+  ame_poverty_m_w <- margins(poverty_glm_m_w, type = "response",data=regdatlim_m_w) |> summary() 
   ame_poverty_m_b <- margins(poverty_glmer_m_b, type = "response",data=regdatlim_m_b) |> summary() 
   ame_poverty_m_h <- margins(poverty_glmer_m_h, type = "response",data=regdatlim_m_h) |> summary() 
   
@@ -253,10 +262,10 @@
   odd_physical_m_h <- margins(physical_glmer_m_h, type = "link",data=regdatlim_m_h) |> summary() 
   
   odd_stress_m_w <- margins(stress_glmer_m_w, type = "link",data=regdatlim_m_w) |> summary() 
-  odd_stress_m_b <- margins(stress_glmer_m_b, type = "link",data=regdatlim_m_b) |> summary() 
+  odd_stress_m_b <- margins(stress_glm_m_b, type = "link",data=regdatlim_m_b) |> summary() 
   odd_stress_m_h <- margins(stress_glmer_m_h, type = "link",data=regdatlim_m_h) |> summary() 
   
-  odd_poverty_m_w <- margins(poverty_glmer_m_w, type = "link",data=regdatlim_m_w) |> summary() 
+  odd_poverty_m_w <- margins(poverty_glm_m_w, type = "link",data=regdatlim_m_w) |> summary() 
   odd_poverty_m_b <- margins(poverty_glmer_m_b, type = "link",data=regdatlim_m_b) |> summary()   
   odd_poverty_m_h <- margins(poverty_glmer_m_h, type = "link",data=regdatlim_m_h) |> summary() 
   

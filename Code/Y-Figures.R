@@ -141,7 +141,7 @@
   segments(x0=rev(AMEwomenlow_w),x1=rev(AMEwomenup_w),y0=(1:3)+0.2,y1=(1:3)+0.2)
   points(y=(1:3)-0.2,x=rev(AMEmen_w),pch=15,col="#1b9e77",cex=1.25)
   points(y=(1:3)+0.2,x=rev(AMEwomen_w),pch=17,col="#d95f02",cex=1.25)
-  legend(x=0.1,y=2,pch=c(17,15),legend=c("Women","Men"),col=c("#d95f02","#1b9e77"),cex=1.25)
+  legend(x=0.1,y=2.25,pch=c(17,15),legend=c("Women","Men"),col=c("#d95f02","#1b9e77"),cex=1.25)
   dev.off()
   
   pdf(file="Output/mainresults_black.pdf",width=7,height=7)
@@ -153,7 +153,7 @@
   segments(x0=rev(AMEwomenlow_b),x1=rev(AMEwomenup_b),y0=(1:3)+0.2,y1=(1:3)+0.2)
   points(y=(1:3)-0.2,x=rev(AMEmen_b),pch=15,col="#1b9e77",cex=1.25)
   points(y=(1:3)+0.2,x=rev(AMEwomen_b),pch=17,col="#d95f02",cex=1.25)
-  legend(x=0.1,y=2,pch=c(17,15),legend=c("Women","Men"),col=c("#d95f02","#1b9e77"),cex=1.25)
+  #legend(x=0.1,y=2,pch=c(17,15),legend=c("Women","Men"),col=c("#d95f02","#1b9e77"),cex=1.25)
   dev.off()
   
   pdf(file="Output/mainresults_hispanic.pdf",width=7,height=7)
@@ -165,7 +165,7 @@
   segments(x0=rev(AMEwomenlow_h),x1=rev(AMEwomenup_h),y0=(1:3)+0.2,y1=(1:3)+0.2)
   points(y=(1:3)-0.2,x=rev(AMEmen_h),pch=15,col="#1b9e77",cex=1.25)
   points(y=(1:3)+0.2,x=rev(AMEwomen_h),pch=17,col="#d95f02",cex=1.25)
-  legend(x=0.1,y=2,pch=c(17,15),legend=c("Women","Men"),col=c("#d95f02","#1b9e77"),cex=1.25)
+  #legend(x=0.1,y=2,pch=c(17,15),legend=c("Women","Men"),col=c("#d95f02","#1b9e77"),cex=1.25)
   dev.off()
 
   
