@@ -28,7 +28,7 @@
   hrs$gender <- factor(hrs$gender,levels=c("Male","Female"))
   
   
-### Prevalence healthy/unhealthy work and job quality ##########################
+### Prevalence healthy/unhealthy work and job quality (unweighted) #############
 
 
   descriptive_rg <- hrs |> filter(wave>=11 & race!="Other" & 
@@ -38,13 +38,14 @@
                                                                      mean(physical,na.rm=T),
                                                                      mean(stress,na.rm=T),
                                                                      mean(poverty,na.rm=T),
+                                                                     mean(eri,na.rm=T),
                                                                      mean(anybad,na.rm=T),
                                                                      mean(allbad,na.rm=T))
   
   names(descriptive_rg) <- c("Gender","Race",
                              "Healthy","Unhealthy",
                              "Physical","Stress","Poverty",
-                             "Any","All")
+                             "ERI","Any","All")
   
   descriptive_t <- hrs |> filter(wave>=11 & race!="Other" & 
                                     stateboth %in% c("working/healthy","working/unhealthy")) |> 
@@ -53,6 +54,7 @@
                                        mean(physical,na.rm=T),
                                        mean(stress,na.rm=T),
                                        mean(poverty,na.rm=T),
+                                       mean(eri,na.rm=T),
                                        mean(anybad,na.rm=T),
                                        mean(allbad,na.rm=T))
   
@@ -63,7 +65,7 @@
   descriptive <- rbind(descriptive_t,descriptive_rg)
   
   
-### Prevalence job quality by work status ######################################
+### Prevalence job quality by work status (unweighted) #########################
 
   # Descriptive
   quality_wu <- hrs |> filter(stateboth=="working/unhealthy" & wave>=11 & 
@@ -71,6 +73,7 @@
     summarise(mean(physical,na.rm=T),
               mean(stress,na.rm=T),
               mean(poverty,na.rm=T),
+              mean(eri,na.rm=T),
               mean(anybad,na.rm=T),
               mean(allbad,na.rm=T))
   
@@ -79,6 +82,7 @@
     summarise(mean(physical,na.rm=T),
               mean(stress,na.rm=T),
               mean(poverty,na.rm=T),
+              mean(eri,na.rm=T),
               mean(anybad,na.rm=T),
               mean(allbad,na.rm=T))
 
@@ -89,6 +93,7 @@
     summarise(mean(physical,na.rm=T),
               mean(stress,na.rm=T),
               mean(poverty,na.rm=T),
+              mean(eri,na.rm=T),
               mean(anybad,na.rm=T),
               mean(allbad,na.rm=T))
   
@@ -98,6 +103,7 @@
     summarise(mean(physical,na.rm=T),
               mean(stress,na.rm=T),
               mean(poverty,na.rm=T),
+              mean(eri,na.rm=T),
               mean(anybad,na.rm=T),
               mean(allbad,na.rm=T))
 
@@ -109,6 +115,7 @@
     summarise(mean(physical,na.rm=T),
               mean(stress,na.rm=T),
               mean(poverty,na.rm=T),
+              mean(eri,na.rm=T),
               mean(anybad,na.rm=T),
               mean(allbad,na.rm=T))
   
@@ -118,6 +125,7 @@
     summarise(mean(physical,na.rm=T),
               mean(stress,na.rm=T),
               mean(poverty,na.rm=T),
+              mean(eri,na.rm=T),
               mean(anybad,na.rm=T),
               mean(allbad,na.rm=T))
   
@@ -128,6 +136,7 @@
     summarise(mean(physical,na.rm=T),
               mean(stress,na.rm=T),
               mean(poverty,na.rm=T),
+              mean(eri,na.rm=T),
               mean(anybad,na.rm=T),
               mean(allbad,na.rm=T))
   
@@ -137,6 +146,7 @@
     summarise(mean(physical,na.rm=T),
               mean(stress,na.rm=T),
               mean(poverty,na.rm=T),
+              mean(eri,na.rm=T),
               mean(anybad,na.rm=T),
               mean(allbad,na.rm=T))
 
@@ -182,12 +192,185 @@
                    quality_wu_r,quality_wh_r,
                    quality_wu_e,quality_wh_e)
   
-  names(quality)[1:5] <- c("physical","stress","poverty","any","all")
+  names(quality)[1:6] <- c("physical","stress","poverty","eri","any","all")
   
-  quality <- quality[,c(9,6:8,1:5)]
+  quality <- quality[,c(10,7:9,1:6)]
   
   
 ### Save #######################################################################
   
   save(list=c("descriptive","quality"),file="Results/descriptive_big.rda")
   
+  
+### Prevalence healthy/unhealthy work and job quality (unweighted) #############
+  
+  
+  descriptive_rg <- hrs |> filter(wave>=11 & race!="Other" & !is.na(weight) &
+                                    stateboth %in% c("working/healthy","working/unhealthy")) |> 
+    group_by(race,gender) |> summarize(weighted.mean(healthywork,w=weight,na.rm=T),
+                                       weighted.mean(unhealthywork,w=weight,na.rm=T),
+                                       weighted.mean(physical,w=weight,na.rm=T),
+                                       weighted.mean(stress,w=weight,na.rm=T),
+                                       weighted.mean(poverty,w=weight,na.rm=T),
+                                       weighted.mean(eri,w=weight,na.rm=T),
+                                       weighted.mean(anybad,w=weight,na.rm=T),
+                                       weighted.mean(allbad,w=weight,na.rm=T))
+  
+  names(descriptive_rg) <- c("Race","Gender",
+                             "Healthy","Unhealthy",
+                             "Physical","Stress","Poverty",
+                             "ERI","Any","All")
+  
+  descriptive_t <- hrs |> filter(wave>=11 & race!="Other" & !is.na(weight) &
+                                   stateboth %in% c("working/healthy","working/unhealthy")) |> 
+    summarize(weighted.mean(healthywork,w=weight,na.rm=T),
+              weighted.mean(unhealthywork,w=weight,na.rm=T),
+              weighted.mean(physical,w=weight,na.rm=T),
+              weighted.mean(stress,w=weight,na.rm=T),
+              weighted.mean(poverty,w=weight,na.rm=T),
+              weighted.mean(eri,w=weight,na.rm=T),
+              weighted.mean(anybad,w=weight,na.rm=T),
+              weighted.mean(allbad,w=weight,na.rm=T))
+  
+  
+  descriptive_t <- data.frame(c("Total","Total",descriptive_t))
+  names(descriptive_t) <- names(descriptive_rg)
+  
+  descriptivew <- rbind(descriptive_t,descriptive_rg)  
+  
+  
+### Prevalence job quality by work status (unweighted) #########################
+  
+  # Descriptive
+  quality_wu <- hrs |> filter(stateboth=="working/unhealthy" & wave>=11 & !is.na(weight) &
+                                race!="Other") |> 
+    summarise(weighted.mean(physical,weight,na.rm=T),
+              weighted.mean(stress,weight,na.rm=T),
+              weighted.mean(poverty,weight,na.rm=T),
+              weighted.mean(eri,weight,na.rm=T),
+              weighted.mean(anybad,weight,na.rm=T),
+              weighted.mean(allbad,weight,na.rm=T))
+  
+  quality_wh <- hrs |> filter(stateboth=="working/healthy" & wave>=11& !is.na(weight) &
+                                race!="Other") |> 
+    summarise(weighted.mean(physical,weight,na.rm=T),
+              weighted.mean(stress,weight,na.rm=T),
+              weighted.mean(poverty,weight,na.rm=T),
+              weighted.mean(eri,weight,na.rm=T),
+              weighted.mean(anybad,weight,na.rm=T),
+              weighted.mean(allbad,weight,na.rm=T))
+  
+  # Descriptive: gender
+  quality_wu_g <- hrs |> filter(stateboth=="working/unhealthy" & wave>=11& !is.na(weight) &
+                                  race!="Other") |> 
+    group_by(gender) |> 
+    summarise(weighted.mean(physical,weight,na.rm=T),
+              weighted.mean(stress,weight,na.rm=T),
+              weighted.mean(poverty,weight,na.rm=T),
+              weighted.mean(eri,weight,na.rm=T),
+              weighted.mean(anybad,weight,na.rm=T),
+              weighted.mean(allbad,weight,na.rm=T))
+  
+  quality_wh_g <- hrs |> filter(stateboth=="working/healthy" & wave>=11& !is.na(weight) &
+                                  race!="Other") |> 
+    group_by(gender) |> 
+    summarise(weighted.mean(physical,weight,na.rm=T),
+              weighted.mean(stress,weight,na.rm=T),
+              weighted.mean(poverty,weight,na.rm=T),
+              weighted.mean(eri,weight,na.rm=T),
+              weighted.mean(anybad,weight,na.rm=T),
+              weighted.mean(allbad,weight,na.rm=T))
+  
+  
+  # Descriptive: gender, race
+  quality_wu_r <- hrs |> filter(stateboth=="working/unhealthy" & wave>=11& !is.na(weight) &
+                                  race!="Other") |> 
+    group_by(gender,race) |> 
+    summarise(weighted.mean(physical,weight,na.rm=T),
+              weighted.mean(stress,weight,na.rm=T),
+              weighted.mean(poverty,weight,na.rm=T),
+              weighted.mean(eri,weight,na.rm=T),
+              weighted.mean(anybad,weight,na.rm=T),
+              weighted.mean(allbad,weight,na.rm=T))
+  
+  quality_wh_r <- hrs |> filter(stateboth=="working/healthy" & wave>=11& !is.na(weight) &
+                                  race!="Other") |> 
+    group_by(gender,race) |> 
+    summarise(weighted.mean(physical,weight,na.rm=T),
+              weighted.mean(stress,weight,na.rm=T),
+              weighted.mean(poverty,weight,na.rm=T),
+              weighted.mean(eri,weight,na.rm=T),
+              weighted.mean(anybad,weight,na.rm=T),
+              weighted.mean(allbad,weight,na.rm=T))
+  
+  # Descriptive: gender, race, education
+  quality_wu_e <- hrs |> filter(stateboth=="working/unhealthy" & wave>=11& !is.na(weight) &
+                                  race!="Other") |> 
+    group_by(gender,race,education) |> 
+    summarise(weighted.mean(physical,weight,na.rm=T),
+              weighted.mean(stress,weight,na.rm=T),
+              weighted.mean(poverty,weight,na.rm=T),
+              weighted.mean(eri,weight,na.rm=T),
+              weighted.mean(anybad,weight,na.rm=T),
+              weighted.mean(allbad,weight,na.rm=T))
+  
+  quality_wh_e <- hrs |> filter(stateboth=="working/healthy" & wave>=11& !is.na(weight) &
+                                  race!="Other") |> 
+    group_by(gender,race,education) |> 
+    summarise(weighted.mean(physical,weight,na.rm=T),
+              weighted.mean(stress,weight,na.rm=T),
+              weighted.mean(poverty,weight,na.rm=T),
+              weighted.mean(eri,weight,na.rm=T),
+              weighted.mean(anybad,weight,na.rm=T),
+              weighted.mean(allbad,weight,na.rm=T))
+  
+  
+### Combine ####################################################################    
+  
+  # Total
+  quality_wu$gender <- "Total"
+  quality_wu$race <- "Total"
+  quality_wu$education <- "Total"
+  
+  quality_wh$gender <- "Total"
+  quality_wh$race <- "Total"
+  quality_wh$education <- "Total"
+  
+  # By gender
+  quality_wu_g$race <- "Total"
+  quality_wu_g$education <- "Total"
+  
+  quality_wh_g$race <- "Total"
+  quality_wh_g$education <- "Total"
+  
+  # By gender/race
+  quality_wu_r$education <- "Total"
+  quality_wh_r$education <- "Total"
+  
+  # Add work/health status everywhere
+  quality_wu$state <- "Working unhealthy"
+  quality_wh$state <- "Working healthy"
+  
+  quality_wu_g$state <- "Working unhealthy"
+  quality_wh_g$state <- "Working healthy"
+  
+  quality_wu_r$state <- "Working unhealthy"
+  quality_wh_r$state <- "Working healthy"
+  
+  quality_wu_e$state <- "Working unhealthy"
+  quality_wh_e$state <- "Working healthy"
+  
+  # Big object
+  qualityw <- rbind(quality_wh,quality_wu,
+                   quality_wu_g,quality_wh_g,
+                   quality_wu_r,quality_wh_r,
+                   quality_wu_e,quality_wh_e)
+  
+  names(qualityw)[1:6] <- c("physical","stress","poverty","eri","any","all")
+  
+  qualityw <- qualityw[,c(10,7:9,1:6)]  
+  
+  
+### Save #######################################################################
+  
+  save(list=c("descriptivew","qualityw"),file="Results/descriptive_weighted.rda")  

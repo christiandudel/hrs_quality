@@ -4,74 +4,43 @@
   library(tidyverse)
 
 
-### Descriptive ################################################################
+### Descriptive (Table 1) ######################################################
 
-  load(file="Results/descriptive_big.rda")
-  
-  write_xlsx(descriptive,path="Output/descriptive.xlsx")
-  
-  
-### Main regression results ####################################################  
-  
-  # Load
-  load("Results/main.rda")
+  # Load weighted results
+  load(file="Results/descriptive_weighted.rda")
 
-  # Object for results
-  results <- expand.grid(gender=c("Total","Male","Female"),
-                         race=c("Total","White","Black","Hispanic"),
-                         outcome=c("Physical","Stress","Poverty"))
-  results <- results |> filter( !(gender=="Total" & race!="Total"))
+  # First part of table: prevalence
+  table1 <- descriptivew |> select(Gender,Race,Healthy,Unhealthy,ERI)
   
-  # Variables to keep from summary object
-  vars <- c("AME","SE","z","p","lower","upper")
+  # Second part: conditional prevalence
+  tmp <- qualityw |> filter(education=="Total") |> select(state,gender,race,eri)
+  tmp <- tmp |> pivot_wider(id_cols=c(gender,race),names_from=state,values_from=eri)
+  tmp <- tmp |> rename(Gender=gender,
+                       Race=race)
   
-  # Paste together all estimates 
-  estimates <- rbind(
-    ame_physical[ame_physical$factor=="statebothworking/unhealthy",vars],  
-    ame_physical_m[ame_physical_m$factor=="statebothworking/unhealthy",vars],
-    ame_physical_f[ame_physical_f$factor=="statebothworking/unhealthy",vars],
-    ame_physical_m_w[ame_physical_m_w$factor=="statebothworking/unhealthy",vars],
-    ame_physical_f_w[ame_physical_f_w$factor=="statebothworking/unhealthy",vars],
-    ame_physical_m_b[ame_physical_m_b$factor=="statebothworking/unhealthy",vars],
-    ame_physical_f_b[ame_physical_f_b$factor=="statebothworking/unhealthy",vars],
-    ame_physical_m_h[ame_physical_m_h$factor=="statebothworking/unhealthy",vars],
-    ame_physical_f_h[ame_physical_f_h$factor=="statebothworking/unhealthy",vars],
-    ame_stress[ame_stress$factor=="statebothworking/unhealthy",vars],  
-    ame_stress_m[ame_stress_m$factor=="statebothworking/unhealthy",vars],
-    ame_stress_f[ame_stress_f$factor=="statebothworking/unhealthy",vars],
-    ame_stress_m_w[ame_stress_m_w$factor=="statebothworking/unhealthy",vars],
-    ame_stress_f_w[ame_stress_f_w$factor=="statebothworking/unhealthy",vars],
-    ame_stress_m_b[ame_stress_m_b$factor=="statebothworking/unhealthy",vars],
-    ame_stress_f_b[ame_stress_f_b$factor=="statebothworking/unhealthy",vars],
-    ame_stress_m_h[ame_stress_m_h$factor=="statebothworking/unhealthy",vars],
-    ame_stress_f_h[ame_stress_f_h$factor=="statebothworking/unhealthy",vars],
-    ame_poverty[ame_poverty$factor=="statebothworking/unhealthy",vars],  
-    ame_poverty_m[ame_poverty_m$factor=="statebothworking/unhealthy",vars],
-    ame_poverty_f[ame_poverty_f$factor=="statebothworking/unhealthy",vars],
-    ame_poverty_m_w[ame_poverty_m_w$factor=="statebothworking/unhealthy",vars],
-    ame_poverty_f_w[ame_poverty_f_w$factor=="statebothworking/unhealthy",vars],
-    ame_poverty_m_b[ame_poverty_m_b$factor=="statebothworking/unhealthy",vars],
-    ame_poverty_f_b[ame_poverty_f_b$factor=="statebothworking/unhealthy",vars],
-    ame_poverty_m_h[ame_poverty_m_h$factor=="statebothworking/unhealthy",vars],
-    ame_poverty_f_h[ame_poverty_f_h$factor=="statebothworking/unhealthy",vars])
-  
-  # Combine 
-  results <- cbind(results,estimates)
+  # Combine
+  table1 <- left_join(table1,tmp,by=c("Gender","Race"))
   
   # Save
-  write_xlsx(results,path="Output/mainresults.xlsx")
+  write_xlsx(table1,path="Output/table1.xlsx")
   
   
-### Robustness check poverty ################################################### 
+### Main SES results (Table 2) #################################################
   
-  # Load
-  load("Results/poverty.rda")
+  # Load regression results
+  load("Results/main.rda")
   
-  # Object for results
-  results <- expand.grid(gender=c("Total"),
-                         race=c("Total"),
-                         outcome=c("Poverty (main)","75%","125%","150%","200%"))
+  # Results
+  table2 <- ame_ses |> 
+              filter(factor%in%c("education1","education2","raceBlack","raceHispan")) |> 
+              select(factor,AME,p,lower,upper)
+  
+  # Save
+  write_xlsx(table2,path="Output/table2.xlsx")
 
+  
+### Robustness, second analysis, poverty #######################################
+  
   # Variables to keep from summary object
   vars <- c("AME","SE","z","p","lower","upper")
   
@@ -83,48 +52,53 @@
     ame_p200[ame_p200$factor=="statebothworking/unhealthy",vars])
   
   # Combine 
-  results <- cbind(results,estimates)
+  types <- c("100%","75%","125%","150%","200%")
+  tableS1 <- cbind(types,estimates)
   
   # Save
-  write_xlsx(results,path="Output/povertyresults.xlsx")
+  write_xlsx(tableS1,path="Output/tableS1.xlsx")
   
   
-### Other robustness checks ####################################################
+### Robustness checks SES ################################################
   
   # Load
   load("Results/no_covid.rda")
   load("Results/healthdef.rda")
   load("Results/pooled.rda")
   
-  # Object for results
-  results <- expand.grid(genderrace=c("Total"),
-                         variant=c("Main","No COVID","Depression","Cogn. impairment","Self-rated health","Pooled"),
-                         outcome=c("Physical","Stress","Poverty"))
+  # Main results
+  tmp <- ame_ses |> 
+         filter(factor%in%c("raceBlack","raceHispan")) |> 
+         select(factor,AME,p,lower,upper)
   
-  # Combine estimates
-  estimates <- rbind(
-    ame_physical[ame_physical$factor=="statebothworking/unhealthy",vars],  
-    ame_covid_physical[ame_covid_physical$factor=="statebothworking/unhealthy",vars],
-    ame_depyr_physical[ame_depyr_physical$factor=="workdepyrworking/unhealthy",vars],
-    ame_cogd_physical[ame_cogd_physical$factor=="workcogdworking/unhealthy",vars],
-    ame_shlt_physical[ame_shlt_physical$factor=="workshltworking/unhealthy",vars],
-    ame_pool_physical[ame_pool_physical$factor=="statebothworking/unhealthy",vars],
-    ame_stress[ame_stress$factor=="statebothworking/unhealthy",vars],  
-    ame_covid_stress[ame_covid_stress$factor=="statebothworking/unhealthy",vars],
-    ame_depyr_stress[ame_depyr_stress$factor=="workdepyrworking/unhealthy",vars],
-    ame_cogd_stress[ame_cogd_stress$factor=="workcogdworking/unhealthy",vars],
-    ame_shlt_stress[ame_shlt_stress$factor=="workshltworking/unhealthy",vars],
-    ame_pool_stress[ame_pool_stress$factor=="statebothworking/unhealthy",vars],
-    ame_poverty[ame_poverty$factor=="statebothworking/unhealthy",vars],  
-    ame_covid_poverty[ame_covid_poverty$factor=="statebothworking/unhealthy",vars],
-    ame_depyr_poverty[ame_depyr_poverty$factor=="workdepyrworking/unhealthy",vars],
-    ame_cogd_poverty[ame_cogd_poverty$factor=="workcogdworking/unhealthy",vars],
-    ame_shlt_poverty[ame_shlt_poverty$factor=="workshltworking/unhealthy",vars],
-    ame_pool_poverty[ame_pool_poverty$factor=="statebothworking/unhealthy",vars])
+  # No covid 
+  tmp_covid <- ame_covid_ses |> 
+               filter(factor%in%c("raceBlack","raceHispan")) |> 
+               select(factor,AME,p,lower,upper)
   
-  # Combine 
-  results <- cbind(results,estimates)
+  # Health: depression
+  tmp_depyr <- ame_depyr_ses |> 
+               filter(factor%in%c("raceBlack","raceHispan")) |> 
+               select(factor,AME,p,lower,upper)
   
+  # Health: cognitive impairment
+  tmp_cogd <- ame_cogd_ses |>
+              filter(factor%in%c("raceBlack","raceHispan")) |>
+              select(factor,AME,p,lower,upper)
+  
+  # Health: subjective health
+  tmp_shlt <- ame_shlt_ses |> 
+              filter(factor%in%c("raceBlack","raceHispan")) |> 
+              select(factor,AME,p,lower,upper)
+  
+  # Pooled logit
+  tmp_pool <- ame_pool_ses |> 
+              filter(factor%in%c("raceBlack","raceHispan")) |> 
+              select(factor,AME,p,lower,upper)
+  
+  # Combine
+  tableS2 <- rbind(tmp,tmp_covid,tmp_depyr,tmp_cogd,tmp_shlt,tmp_pool)
+
   # Save
-  write_xlsx(results,path="Output/robustness.xlsx")
+  write_xlsx(tableS2,path="Output/tableS2.xlsx")
   

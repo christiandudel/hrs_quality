@@ -302,6 +302,43 @@
   hrs <- hrs |> mutate(poverty200=NA,
                        poverty200=ifelse(povhhi<povthr*2,1,poverty200),
                        poverty200=ifelse(povhhi>=povthr*2,0,poverty200))
+  
+  # Effort-reward imbalance (1=yes, 0=no)
+  hrs <- hrs |> mutate(eri=NA,
+                       eri=ifelse((physical%in%1 | stress%in%1) & poverty%in%1,1,eri),
+                       eri=ifelse((physical%in%0 & stress%in%0) & poverty%in%1,0,eri),
+                       eri=ifelse((physical%in%1 | stress%in%1) & poverty%in%0,0,eri),
+                       eri=ifelse(physical%in%0 & stress%in%0 & poverty%in%0,0,eri),
+                       eri=ifelse(is.na(physical)|is.na(stress)|is.na(poverty),NA,eri))
+  
+  # Effort-reward imbalance, alternative poverty thresholds
+  hrs <- hrs |> mutate(eri75=NA,
+                       eri75=ifelse((physical%in%1 | stress%in%1) & poverty75%in%1,1,eri75),
+                       eri75=ifelse((physical%in%0 & stress%in%0) & poverty75%in%1,0,eri75),
+                       eri75=ifelse((physical%in%1 | stress%in%1) & poverty75%in%0,0,eri75),
+                       eri75=ifelse(physical%in%0 & stress%in%0 & poverty75%in%0,0,eri75),
+                       eri75=ifelse(is.na(physical)|is.na(stress)|is.na(poverty75),NA,eri75))
+  
+  hrs <- hrs |> mutate(eri125=NA,
+                       eri125=ifelse((physical%in%1 | stress%in%1) & poverty125%in%1,1,eri125),
+                       eri125=ifelse((physical%in%0 & stress%in%0) & poverty125%in%1,0,eri125),
+                       eri125=ifelse((physical%in%1 | stress%in%1) & poverty125%in%0,0,eri125),
+                       eri125=ifelse(physical%in%0 & stress%in%0 & poverty125%in%0,0,eri125),
+                       eri125=ifelse(is.na(physical)|is.na(stress)|is.na(poverty125),NA,eri125))
+  
+  hrs <- hrs |> mutate(eri150=NA,
+                       eri150=ifelse((physical%in%1 | stress%in%1) & poverty150%in%1,1,eri150),
+                       eri150=ifelse((physical%in%0 & stress%in%0) & poverty150%in%1,0,eri150),
+                       eri150=ifelse((physical%in%1 | stress%in%1) & poverty150%in%0,0,eri150),
+                       eri150=ifelse(physical%in%0 & stress%in%0 & poverty150%in%0,0,eri150),
+                       eri150=ifelse(is.na(physical)|is.na(stress)|is.na(poverty150),NA,eri150))
+  
+  hrs <- hrs |> mutate(eri200=NA,
+                       eri200=ifelse((physical%in%1 | stress%in%1) & poverty200%in%1,1,eri200),
+                       eri200=ifelse((physical%in%0 & stress%in%0) & poverty200%in%1,0,eri200),
+                       eri200=ifelse((physical%in%1 | stress%in%1) & poverty200%in%0,0,eri200),
+                       eri200=ifelse(physical%in%0 & stress%in%0 & poverty200%in%0,0,eri200),
+                       eri200=ifelse(is.na(physical)|is.na(stress)|is.na(poverty200),NA,eri200))
 
   # Any (1=yes, 0=no)
   hrs <- hrs |> mutate(anybad=NA,
@@ -339,8 +376,9 @@
   # Limit variables
   hrs <- hrs |> select(hhidpn,ragender,race,education,wave,age,
                        stateboth,workshlt,workdepyr,workcogd,shlt,depyr,cogd,
-                       stress,physical,poverty,anybad,allbad,pair1,pair2,pair3,
+                       stress,physical,poverty,eri,anybad,allbad,pair1,pair2,pair3,
                        poverty75,poverty125,poverty150,poverty200,
+                       eri75,eri125,eri150,eri200,
                        wtresp)
 
   # Rename

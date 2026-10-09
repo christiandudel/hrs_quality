@@ -22,7 +22,7 @@
   
   # Edit variables a bit
   regdat$age2 <- regdat$age^2
-  regdat$race <- as.factor(regdat$race)
+  regdat$race <- factor(regdat$race,levels=regdat$race |> unique())
   regdat$wave <- as.factor(regdat$wave)
   regdat$education <- as.factor(regdat$education)
   regdat$gender <- as.factor(regdat$gender)
