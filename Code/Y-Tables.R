@@ -39,26 +39,6 @@
   write_xlsx(table2,path="Output/table2.xlsx")
 
   
-### Robustness, second analysis, poverty #######################################
-  
-  # Variables to keep from summary object
-  vars <- c("AME","SE","z","p","lower","upper")
-  
-  estimates <- rbind(
-    ame_p100[ame_p100$factor=="statebothworking/unhealthy",vars],  
-    ame_p75[ame_p75$factor=="statebothworking/unhealthy",vars],
-    ame_p125[ame_p125$factor=="statebothworking/unhealthy",vars],
-    ame_p150[ame_p150$factor=="statebothworking/unhealthy",vars],
-    ame_p200[ame_p200$factor=="statebothworking/unhealthy",vars])
-  
-  # Combine 
-  types <- c("100%","75%","125%","150%","200%")
-  tableS1 <- cbind(types,estimates)
-  
-  # Save
-  write_xlsx(tableS1,path="Output/tableS1.xlsx")
-  
-  
 ### Robustness checks SES ################################################
   
   # Load
@@ -100,5 +80,25 @@
   tableS2 <- rbind(tmp,tmp_covid,tmp_depyr,tmp_cogd,tmp_shlt,tmp_pool)
 
   # Save
-  write_xlsx(tableS2,path="Output/tableS2.xlsx")
+  write_xlsx(tableS2,path="Output/tableS1.xlsx")
   
+  
+  
+### Robustness, second analysis, poverty #######################################
+  
+  # Variables to keep from summary object
+  vars <- c("AME","SE","z","p","lower","upper")
+  
+  estimates <- rbind(
+    ame_p100[ame_p100$factor=="statebothworking/unhealthy",vars],  
+    ame_p75[ame_p75$factor=="statebothworking/unhealthy",vars],
+    ame_p125[ame_p125$factor=="statebothworking/unhealthy",vars],
+    ame_p150[ame_p150$factor=="statebothworking/unhealthy",vars],
+    ame_p200[ame_p200$factor=="statebothworking/unhealthy",vars])
+  
+  # Combine 
+  types <- c("100%","75%","125%","150%","200%")
+  tableS1 <- cbind(types,estimates)
+  
+  # Save
+  write_xlsx(tableS1,path="Output/tableS2.xlsx")  

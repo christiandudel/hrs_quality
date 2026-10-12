@@ -10,8 +10,75 @@
   load("Results/main.rda")
   load("Results/poverty.rda")
 
-### Robustness check poverty ################################################### 
 
+### AMEs: Gender ###############################################################
+
+  AMEmen <- c(ame_eri_m[ame_eri_m$factor=="statebothworking/unhealthy","AME"],
+              ame_physical_m[ame_physical_m$factor=="statebothworking/unhealthy","AME"],
+              ame_stress_m[ame_stress_m$factor=="statebothworking/unhealthy","AME"],
+              ame_poverty_m[ame_poverty_m$factor=="statebothworking/unhealthy","AME"])
+  
+  AMEmenlow <- c(ame_eri_m[ame_eri_m$factor=="statebothworking/unhealthy","lower"],
+                 ame_physical_m[ame_physical_m$factor=="statebothworking/unhealthy","lower"],
+                 ame_stress_m[ame_stress_m$factor=="statebothworking/unhealthy","lower"],
+                 ame_poverty_m[ame_poverty_m$factor=="statebothworking/unhealthy","lower"])
+  
+  AMEmenup <- c(ame_eri_m[ame_eri_m$factor=="statebothworking/unhealthy","upper"],
+                ame_physical_m[ame_physical_m$factor=="statebothworking/unhealthy","upper"],
+                 ame_stress_m[ame_stress_m$factor=="statebothworking/unhealthy","upper"],
+                 ame_poverty_m[ame_poverty_m$factor=="statebothworking/unhealthy","upper"])
+  
+  
+  AMEwomen <- c(ame_eri_f[ame_eri_f$factor=="statebothworking/unhealthy","AME"],
+              ame_physical_f[ame_physical_f$factor=="statebothworking/unhealthy","AME"],
+              ame_stress_f[ame_stress_f$factor=="statebothworking/unhealthy","AME"],
+              ame_poverty_f[ame_poverty_f$factor=="statebothworking/unhealthy","AME"])
+  
+  AMEwomenlow <- c(ame_eri_f[ame_eri_f$factor=="statebothworking/unhealthy","lower"],
+                  ame_physical_f[ame_physical_f$factor=="statebothworking/unhealthy","lower"],
+                 ame_stress_f[ame_stress_f$factor=="statebothworking/unhealthy","lower"],
+                 ame_poverty_f[ame_poverty_f$factor=="statebothworking/unhealthy","lower"])
+  
+  AMEwomenup <- c(ame_eri_f[ame_eri_f$factor=="statebothworking/unhealthy","upper"],
+                  ame_physical_f[ame_physical_f$factor=="statebothworking/unhealthy","upper"],
+                  ame_stress_f[ame_stress_f$factor=="statebothworking/unhealthy","upper"],
+                  ame_poverty_f[ame_poverty_f$factor=="statebothworking/unhealthy","upper"])
+  
+  pdf(file="Output/figure1.pdf",width=7,height=7)
+  labels <- c("Effort-reward imbalance","Physical","Stress","Poverty")
+  fake <- rep(100,4)
+  names(fake) <- labels
+  dotchart(x=rev(fake),xlab="Average marginal effect of unhealthy work",xlim=c(-0.05,0.1),pch=15,ylim=c(0.5,4.5))
+  abline(v=0,col="grey70")
+  #abline(h=1.5)
+  #abline(h=2.5)
+  abline(h=3.5)
+  segments(x0=rev(AMEmenlow),x1=rev(AMEmenup),y0=(1:4)-0.2,y1=(1:4)-0.2)
+  segments(x0=rev(AMEwomenlow),x1=rev(AMEwomenup),y0=(1:4)+0.2,y1=(1:4)+0.2)
+  points(y=(1:4)-0.2,x=rev(AMEmen),pch=15,col="#1b9e77",cex=1.25)
+  points(y=(1:4)+0.2,x=rev(AMEwomen),pch=17,col="#d95f02",cex=1.25)
+  legend(x=0.06,y=1,pch=c(17,15),legend=c("Women","Men"),col=c("#d95f02","#1b9e77"),cex=1.25)
+  dev.off()
+  
+  png(file="Output/figure1.png",width=7,height=7,unit="in",res=300)
+  labels <- c("Effort-reward imbalance","Physical","Stress","Poverty")
+  fake <- rep(100,4)
+  names(fake) <- labels
+  dotchart(x=rev(fake),xlab="Average marginal effect of unhealthy work",xlim=c(-0.05,0.1),pch=15,ylim=c(0.5,4.5))
+  abline(v=0,col="grey70")
+  #abline(h=1.5)
+  #abline(h=2.5)
+  abline(h=3.5)
+  segments(x0=rev(AMEmenlow),x1=rev(AMEmenup),y0=(1:4)-0.2,y1=(1:4)-0.2)
+  segments(x0=rev(AMEwomenlow),x1=rev(AMEwomenup),y0=(1:4)+0.2,y1=(1:4)+0.2)
+  points(y=(1:4)-0.2,x=rev(AMEmen),pch=15,col="#1b9e77",cex=1.25)
+  points(y=(1:4)+0.2,x=rev(AMEwomen),pch=17,col="#d95f02",cex=1.25)
+  legend(x=0.06,y=1,pch=c(17,15),legend=c("Women","Men"),col=c("#d95f02","#1b9e77"),cex=1.25)
+  dev.off()
+  
+  
+### Robustness check poverty ################################################### 
+  
   # Arrange
   AMEwhite <- rep(0,5)
   AMEwhitelow <- rep(0,5)
@@ -48,114 +115,48 @@
                     ame_ses200[ame_ses200$factor=="raceHispan","lower"])
   
   AMEhispanup <- c(ame_ses100[ame_ses100$factor=="raceHispan","upper"],
-                    ame_ses75[ame_ses75$factor=="raceHispan","upper"],
-                    ame_ses125[ame_ses125$factor=="raceHispan","upper"],
-                    ame_ses150[ame_ses150$factor=="raceHispan","upper"],
-                    ame_ses200[ame_ses200$factor=="raceHispan","upper"])
+                   ame_ses75[ame_ses75$factor=="raceHispan","upper"],
+                   ame_ses125[ame_ses125$factor=="raceHispan","upper"],
+                   ame_ses150[ame_ses150$factor=="raceHispan","upper"],
+                   ame_ses200[ame_ses200$factor=="raceHispan","upper"])
   
-  
-  pdf(file="Output/figure1.pdf",width=7,height=7)
-  labels <- c("Main analysis","75%","125%","150%","200%")
-  fake <- rep(100,5)
-  names(fake) <- labels
-  dotchart(x=rev(fake),xlab="Average marginal effect of race/ethnicity",xlim=c(-0.05,0.15),pch=15,ylim=c(0.5,5.5))
-  abline(v=0,col="grey70")
-  abline(h=1.5)
-  abline(h=2.5)
-  abline(h=3.5)
-  abline(h=4.5)
-  segments(x0=rev(AMEwhitelow),x1=rev(AMEwhiteup),y0=(1:5)+0.2,y1=(1:5)+0.2)
-  segments(x0=rev(AMEblacklow),x1=rev(AMEblackup),y0=(1:5),y1=(1:5))
-  segments(x0=rev(AMEhispanlow),x1=rev(AMEhispanup),y0=(1:5)-0.2,y1=(1:5)-0.2)
-  points(y=(1:5)+0.2,x=rev(AMEwhite),pch=16,col="#a6cee3",cex=1.25)
-  points(y=(1:5),x=rev(AMEblack),pch=15,col="#1f78b4",cex=1.25)
-  points(y=(1:5)-0.2,x=rev(AMEhispan),pch=17,col="#b2df8a",cex=1.25)
-  legend(x=0.085,y=5.3,pch=c(16,15,17),legend=c("White (ref.)","Black","Hispanic"),col=c("#a6cee3","#1f78b4","#b2df8a"),cex=1.05)
-  dev.off()
-  
-  png(file="Output/figure1.png",width=7,height=7,units="in",res=300)
-  labels <- c("Main analysis","75%","125%","150%","200%")
-  fake <- rep(100,5)
-  names(fake) <- labels
-  dotchart(x=rev(fake),xlab="Average marginal effect of race/ethnicity",xlim=c(-0.05,0.15),pch=15,ylim=c(0.5,5.5))
-  abline(v=0,col="grey70")
-  abline(h=1.5)
-  abline(h=2.5)
-  abline(h=3.5)
-  abline(h=4.5)
-  segments(x0=rev(AMEwhitelow),x1=rev(AMEwhiteup),y0=(1:5)+0.2,y1=(1:5)+0.2)
-  segments(x0=rev(AMEblacklow),x1=rev(AMEblackup),y0=(1:5),y1=(1:5))
-  segments(x0=rev(AMEhispanlow),x1=rev(AMEhispanup),y0=(1:5)-0.2,y1=(1:5)-0.2)
-  points(y=(1:5)+0.2,x=rev(AMEwhite),pch=16,col="#a6cee3",cex=1.25)
-  points(y=(1:5),x=rev(AMEblack),pch=15,col="#1f78b4",cex=1.25)
-  points(y=(1:5)-0.2,x=rev(AMEhispan),pch=17,col="#b2df8a",cex=1.25)
-  legend(x=0.085,y=5.3,pch=c(16,15,17),legend=c("White (ref.)","Black","Hispanic"),col=c("#a6cee3","#1f78b4","#b2df8a"),cex=1.05)
-  dev.off()
-  
-
-### AMEs: Gender ###############################################################
-
-  AMEmen <- c(ame_eri_m[ame_eri_m$factor=="statebothworking/unhealthy","AME"],
-              ame_physical_m[ame_physical_m$factor=="statebothworking/unhealthy","AME"],
-              ame_stress_m[ame_stress_m$factor=="statebothworking/unhealthy","AME"],
-              ame_poverty_m[ame_poverty_m$factor=="statebothworking/unhealthy","AME"])
-  
-  AMEmenlow <- c(ame_eri_m[ame_eri_m$factor=="statebothworking/unhealthy","lower"],
-                 ame_physical_m[ame_physical_m$factor=="statebothworking/unhealthy","lower"],
-                 ame_stress_m[ame_stress_m$factor=="statebothworking/unhealthy","lower"],
-                 ame_poverty_m[ame_poverty_m$factor=="statebothworking/unhealthy","lower"])
-  
-  AMEmenup <- c(ame_eri_m[ame_eri_m$factor=="statebothworking/unhealthy","upper"],
-                ame_physical_m[ame_physical_m$factor=="statebothworking/unhealthy","upper"],
-                 ame_stress_m[ame_stress_m$factor=="statebothworking/unhealthy","upper"],
-                 ame_poverty_m[ame_poverty_m$factor=="statebothworking/unhealthy","upper"])
-  
-  
-  AMEwomen <- c(ame_eri_f[ame_eri_f$factor=="statebothworking/unhealthy","AME"],
-              ame_physical_f[ame_physical_f$factor=="statebothworking/unhealthy","AME"],
-              ame_stress_f[ame_stress_f$factor=="statebothworking/unhealthy","AME"],
-              ame_poverty_f[ame_poverty_f$factor=="statebothworking/unhealthy","AME"])
-  
-  AMEwomenlow <- c(ame_eri_f[ame_eri_f$factor=="statebothworking/unhealthy","lower"],
-                  ame_physical_f[ame_physical_f$factor=="statebothworking/unhealthy","lower"],
-                 ame_stress_f[ame_stress_f$factor=="statebothworking/unhealthy","lower"],
-                 ame_poverty_f[ame_poverty_f$factor=="statebothworking/unhealthy","lower"])
-  
-  AMEwomenup <- c(ame_eri_f[ame_eri_f$factor=="statebothworking/unhealthy","upper"],
-                  ame_physical_f[ame_physical_f$factor=="statebothworking/unhealthy","upper"],
-                  ame_stress_f[ame_stress_f$factor=="statebothworking/unhealthy","upper"],
-                  ame_poverty_f[ame_poverty_f$factor=="statebothworking/unhealthy","upper"])
   
   pdf(file="Output/figure2.pdf",width=7,height=7)
-  labels <- c("Effort-reward imbalance","Physical","Stress","Poverty")
-  fake <- rep(100,4)
+  labels <- c("Main analysis","75%","125%","150%","200%")
+  fake <- rep(100,5)
   names(fake) <- labels
-  dotchart(x=rev(fake),xlab="Average marginal effect of unhealthy work",xlim=c(-0.05,0.1),pch=15,ylim=c(0.5,4.5))
+  dotchart(x=rev(fake),xlab="Average marginal effect of race/ethnicity",xlim=c(-0.05,0.15),pch=15,ylim=c(0.5,5.5))
   abline(v=0,col="grey70")
-  #abline(h=1.5)
-  #abline(h=2.5)
+  abline(h=1.5)
+  abline(h=2.5)
   abline(h=3.5)
-  segments(x0=rev(AMEmenlow),x1=rev(AMEmenup),y0=(1:4)-0.2,y1=(1:4)-0.2)
-  segments(x0=rev(AMEwomenlow),x1=rev(AMEwomenup),y0=(1:4)+0.2,y1=(1:4)+0.2)
-  points(y=(1:4)-0.2,x=rev(AMEmen),pch=15,col="#1b9e77",cex=1.25)
-  points(y=(1:4)+0.2,x=rev(AMEwomen),pch=17,col="#d95f02",cex=1.25)
-  legend(x=0.06,y=1,pch=c(17,15),legend=c("Women","Men"),col=c("#d95f02","#1b9e77"),cex=1.25)
+  abline(h=4.5)
+  segments(x0=rev(AMEwhitelow),x1=rev(AMEwhiteup),y0=(1:5)+0.2,y1=(1:5)+0.2)
+  segments(x0=rev(AMEblacklow),x1=rev(AMEblackup),y0=(1:5),y1=(1:5))
+  segments(x0=rev(AMEhispanlow),x1=rev(AMEhispanup),y0=(1:5)-0.2,y1=(1:5)-0.2)
+  points(y=(1:5)+0.2,x=rev(AMEwhite),pch=16,col="#a6cee3",cex=1.25)
+  points(y=(1:5),x=rev(AMEblack),pch=15,col="#1f78b4",cex=1.25)
+  points(y=(1:5)-0.2,x=rev(AMEhispan),pch=17,col="#b2df8a",cex=1.25)
+  legend(x=0.085,y=5.3,pch=c(16,15,17),legend=c("White (ref.)","Black","Hispanic"),col=c("#a6cee3","#1f78b4","#b2df8a"),cex=1.05)
   dev.off()
   
-  png(file="Output/figure2.png",width=7,height=7,unit="in",res=300)
-  labels <- c("Effort-reward imbalance","Physical","Stress","Poverty")
-  fake <- rep(100,4)
+  png(file="Output/figure2.png",width=7,height=7,units="in",res=300)
+  labels <- c("Main analysis","75%","125%","150%","200%")
+  fake <- rep(100,5)
   names(fake) <- labels
-  dotchart(x=rev(fake),xlab="Average marginal effect of unhealthy work",xlim=c(-0.05,0.1),pch=15,ylim=c(0.5,4.5))
+  dotchart(x=rev(fake),xlab="Average marginal effect of race/ethnicity",xlim=c(-0.05,0.15),pch=15,ylim=c(0.5,5.5))
   abline(v=0,col="grey70")
-  #abline(h=1.5)
-  #abline(h=2.5)
+  abline(h=1.5)
+  abline(h=2.5)
   abline(h=3.5)
-  segments(x0=rev(AMEmenlow),x1=rev(AMEmenup),y0=(1:4)-0.2,y1=(1:4)-0.2)
-  segments(x0=rev(AMEwomenlow),x1=rev(AMEwomenup),y0=(1:4)+0.2,y1=(1:4)+0.2)
-  points(y=(1:4)-0.2,x=rev(AMEmen),pch=15,col="#1b9e77",cex=1.25)
-  points(y=(1:4)+0.2,x=rev(AMEwomen),pch=17,col="#d95f02",cex=1.25)
-  legend(x=0.06,y=1,pch=c(17,15),legend=c("Women","Men"),col=c("#d95f02","#1b9e77"),cex=1.25)
+  abline(h=4.5)
+  segments(x0=rev(AMEwhitelow),x1=rev(AMEwhiteup),y0=(1:5)+0.2,y1=(1:5)+0.2)
+  segments(x0=rev(AMEblacklow),x1=rev(AMEblackup),y0=(1:5),y1=(1:5))
+  segments(x0=rev(AMEhispanlow),x1=rev(AMEhispanup),y0=(1:5)-0.2,y1=(1:5)-0.2)
+  points(y=(1:5)+0.2,x=rev(AMEwhite),pch=16,col="#a6cee3",cex=1.25)
+  points(y=(1:5),x=rev(AMEblack),pch=15,col="#1f78b4",cex=1.25)
+  points(y=(1:5)-0.2,x=rev(AMEhispan),pch=17,col="#b2df8a",cex=1.25)
+  legend(x=0.085,y=5.3,pch=c(16,15,17),legend=c("White (ref.)","Black","Hispanic"),col=c("#a6cee3","#1f78b4","#b2df8a"),cex=1.05)
   dev.off()
   
   
